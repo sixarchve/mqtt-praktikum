@@ -93,7 +93,7 @@ QoS test topic: `smartroom/qos/test` — published 3 times at QoS 0, 1, and 2.
 
 ## Running
 
-Start a subscriber in one terminal, then run the publisher in another.
+Start a subscriber in one terminal, then run the publisher in another. All scripts are interactive and will prompt for broker hostname and port. Press `Enter` to select the default option displayed in brackets `[...]`.
 
 ```bash
 # Terminal 1 — pick one
@@ -106,45 +106,34 @@ python3 subscriber_hash.py
 python3 publisher.py
 ```
 
-### Expected Output
+### Expected Output & Prompts
 
 **subscriber_basic.py**
 ```
+Enter broker host [localhost]: 
+Enter broker port [1883]: 
+Enter topic to subscribe [smartroom/room1/temperature]: 
+[CONNECTING] Broker localhost:1883
 [CONNECTED] Broker localhost:1883
 [SUBSCRIBED] smartroom/room1/temperature
-[RECEIVED] Topic: smartroom/room1/temperature | Payload: 27.5 | QoS: 0
+[RECEIVED] Topic: smartroom/room1/temperature | Payload: 24.6 | QoS: 0
 ```
 
-**subscriber_qos.py**
+**publisher.py**
 ```
+Enter broker host [localhost]: 
+Enter broker port [1883]: 
+[CONNECTING] Broker localhost:1883
 [CONNECTED] Broker localhost:1883
-[SUBSCRIBED] smartroom/qos/test | QoS: 2
-[RECEIVED] Topic: smartroom/qos/test | Payload: Test QoS 0 | QoS: 0
-[RECEIVED] Topic: smartroom/qos/test | Payload: Test QoS 1 | QoS: 1
-[RECEIVED] Topic: smartroom/qos/test | Payload: Test QoS 2 | QoS: 2
-```
 
-**subscriber_plus.py**
-```
-[CONNECTED] Broker localhost:1883
-[SUBSCRIBED] smartroom/+/temperature
-[RECEIVED] Topic: smartroom/room1/temperature | Payload: 27.5 | QoS: 0
-[RECEIVED] Topic: smartroom/room2/temperature | Payload: 29.1 | QoS: 0
-```
-
-**subscriber_hash.py**
-```
-[CONNECTED] Broker localhost:1883
-[SUBSCRIBED] smartroom/#
-[RECEIVED] Topic: smartroom/room1/temperature | Payload: 27.5 | QoS: 0
-[RECEIVED] Topic: smartroom/room1/humidity | Payload: 70 | QoS: 0
-[RECEIVED] Topic: smartroom/room1/light | Payload: ON | QoS: 0
-[RECEIVED] Topic: smartroom/room2/temperature | Payload: 29.1 | QoS: 0
-[RECEIVED] Topic: smartroom/room2/humidity | Payload: 65 | QoS: 0
-[RECEIVED] Topic: smartroom/room2/light | Payload: OFF | QoS: 0
-[RECEIVED] Topic: smartroom/qos/test | Payload: Test QoS 0 | QoS: 0
-[RECEIVED] Topic: smartroom/qos/test | Payload: Test QoS 1 | QoS: 1
-[RECEIVED] Topic: smartroom/qos/test | Payload: Test QoS 2 | QoS: 2
+--- MQTT Publisher Menu ---
+1. Start automated loop (publishes randomized sensor readings every 5 seconds)
+2. Publish a custom message
+3. Exit
+Choose option: 1
+[INFO] Starting automated loop. Press Ctrl+C to return to menu.
+[PUBLISHED] Topic: smartroom/room1/temperature | Payload: 24.6 | QoS: 0
+...
 ```
 
 ## QoS Levels
@@ -157,4 +146,4 @@ python3 publisher.py
 
 ---
 
-Press `Ctrl+C` to stop any subscriber.
+Press `Ctrl+C` to stop any subscriber or stop the running automated publisher loop.
