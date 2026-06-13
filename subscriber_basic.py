@@ -43,12 +43,31 @@ def on_message(client, userdata, message):
 
 
 def main() -> None:
+    broker = input(f"Enter broker host [{BROKER}]: ").strip() or BROKER
+    port_input = input(f"Enter broker port [{PORT}]: ").strip()
+    try:
+        port = int(port_input) if port_input else PORT
+    except ValueError:
+        log(f"Invalid port, using default {PORT}")
+        port = PORT
+
+    topic = input(f"Enter topic to subscribe [{TOPIC}]: ").strip() or TOPIC
+
     client = create_client()
-    client.on_connect = on_connect
+    
+    def on_connect_local(client, userdata, flags, reason_code, properties=None):
+        if is_success(reason_code):
+            log(f"[CONNECTED] Broker {broker}:{port}")
+            client.subscribe(topic)
+            log(f"[SUBSCRIBED] {topic}")
+        else:
+            log(f"[ERROR] Connection failed: {reason_code}")
+
+    client.on_connect = on_connect_local
     client.on_message = on_message
 
-    log(f"[CONNECTING] Broker {BROKER}:{PORT}")
-    client.connect(BROKER, PORT, KEEPALIVE)
+    log(f"[CONNECTING] Broker {broker}:{port}")
+    client.connect(broker, port, KEEPALIVE)
     try:
         client.loop_forever()
     except KeyboardInterrupt:

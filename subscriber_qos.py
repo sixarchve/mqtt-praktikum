@@ -44,12 +44,38 @@ def on_message(client, userdata, message):
 
 
 def main() -> None:
+    broker = input(f"Enter broker host [{BROKER}]: ").strip() or BROKER
+    port_input = input(f"Enter broker port [{PORT}]: ").strip()
+    try:
+        port = int(port_input) if port_input else PORT
+    except ValueError:
+        log(f"Invalid port, using default {PORT}")
+        port = PORT
+
+    qos_input = input(f"Enter QoS level to subscribe (0, 1, 2) [{SUBSCRIBE_QOS}]: ").strip()
+    try:
+        subscribe_qos = int(qos_input) if qos_input else SUBSCRIBE_QOS
+        if subscribe_qos not in (0, 1, 2):
+            raise ValueError
+    except ValueError:
+        log(f"Invalid QoS level, using default {SUBSCRIBE_QOS}")
+        subscribe_qos = SUBSCRIBE_QOS
+
     client = create_client()
-    client.on_connect = on_connect
+    
+    def on_connect_local(client, userdata, flags, reason_code, properties=None):
+        if is_success(reason_code):
+            log(f"[CONNECTED] Broker {broker}:{port}")
+            client.subscribe(TOPIC, qos=subscribe_qos)
+            log(f"[SUBSCRIBED] {TOPIC} | QoS: {subscribe_qos}")
+        else:
+            log(f"[ERROR] Connection failed: {reason_code}")
+
+    client.on_connect = on_connect_local
     client.on_message = on_message
 
-    log(f"[CONNECTING] Broker {BROKER}:{PORT}")
-    client.connect(BROKER, PORT, KEEPALIVE)
+    log(f"[CONNECTING] Broker {broker}:{port}")
+    client.connect(broker, port, KEEPALIVE)
     try:
         client.loop_forever()
     except KeyboardInterrupt:
